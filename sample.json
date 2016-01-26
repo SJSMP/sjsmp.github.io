@@ -1,0 +1,148 @@
+schema
+{
+	result:"ok",
+	type:"SimpleJMP/schema",
+    version: "1.1",
+	name:"SmsServer",
+	description:"An SMS Server",
+	group:"Group for SMS servers",
+	schema_version:"<something>",
+	port:12345,
+	objects: {
+		"svyaznoy":{
+			description:"Коннекшен к Связному",
+			group:"connection",
+			properties: {
+				"currentCps": {type:"int", readonly:true, show_graph=true, description:"Текущий CPS"},
+				"limitCps": {type:"int", readonly:false, min_value:0, limits: {min:-1, max:1} }
+			},
+			actions: {
+				"reconnect": {
+					description:"reconnect the connection"
+					result:"void", 
+					require_confirm:true,
+					parameters:{}
+				},
+				"returnParam": {
+					result:"string", 
+					parameters:{
+						"param1":{
+							type:"string", 
+							description:"Что вернуть"
+						}
+					} 
+				}
+			}
+		},
+		"beeline" : {
+			description:"Коннекшен к Билайну",
+			group:"connection",
+			properties: {
+				"currentCps": {type:"int32", readonly:true, showGraph=true},
+				"limitCps": {type:"int", readonly:false}
+			},
+			actions: {
+				"reconnect": {
+					result:"void", 
+					parameters:{}
+				},
+				"returnParam": {
+					result:"string", 
+					parameters:{
+						"param1":{
+							type:"string", 
+							description:"Что вернуть"
+						}
+					} 
+				}
+			}
+		}
+	}
+}
+
+response
+{
+	request_id:"token",
+	result:"error",
+	message:"your request is so failed"
+}
+
+
+request
+{
+	request_id:"token",
+	action:"get_properties",
+}
+response
+{
+	request_id:"token",
+	result:"ok",
+	objects:{
+		"svyaznoy":{
+			"currentCps": 1,
+			"limitCps": 5
+		},
+		"beeline" : {
+			"currentCps": 4,
+			"limitCps": 1,
+		}
+	}
+}
+
+request
+{
+	action:"get_properties",
+	object_name: "svyaznoy"
+}
+response
+{
+	result:"ok",
+	objects:{
+		"svyaznoy":{
+			"currentCps": 1,
+			"limitCps": 5
+		}
+	}
+}
+
+request
+{
+	action:"get_properties",
+	object_name:"svyaznoy",
+	property_name:"currentCps"
+}
+response
+{
+	result:"ok",
+	objects:{
+		"svyaznoy":{
+			"currentCps": 1
+		}
+	}
+}
+
+request
+{
+	action:"set_property",
+	object_name:"svyaznoy",
+	property_name:"limitCps",
+	value:5
+}
+response
+{
+	result:"ok"
+}
+
+
+request
+{
+	action:"execute",
+	object_name:"svyaznoy",
+	action_name:"returnParam",
+	parameters:{"param1":"return_me"}
+}
+response
+{
+	result:"ok",
+	value:"return_me"
+}
